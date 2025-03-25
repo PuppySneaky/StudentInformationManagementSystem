@@ -24,17 +24,17 @@ namespace StudentInformationManagementSystem.Models
         public string LastName { get; set; }
 
         [DataType(DataType.Date)]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; }
 
         [StringLength(200)]
-        public string Address { get; set; }
+        public string Address { get; set; } = ""; // Default to empty string instead of null
 
         [StringLength(20)]
         public string PhoneNumber { get; set; }
 
         // Student ID number assigned by the university
         [StringLength(20)]
-        public string StudentNumber { get; set; }
+        public string StudentNumber { get; set; } = ""; // Default to empty string instead of null
 
         // Additional student-specific fields can be added here
         public DateTime EnrollmentDate { get; set; }
