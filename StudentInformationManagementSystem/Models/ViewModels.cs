@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace StudentInformationManagementSystem.Models
 {
@@ -49,5 +50,22 @@ namespace StudentInformationManagementSystem.Models
         [Display(Name = "Last Name")]
         [StringLength(50, ErrorMessage = "The {0} must be between {2} and {1} characters long.", MinimumLength = 2)]
         public string LastName { get; set; }
+
+        [Display(Name = "Address")]
+        [StringLength(200)]
+        public string Address { get; set; }
+
+        [Display(Name = "Phone Number")]
+        [StringLength(20)]
+        [DataType(DataType.PhoneNumber)]
+        public string PhoneNumber { get; set; }
+
+        [Display(Name = "Student Number")]
+        [StringLength(20)]
+        public string StudentNumber { get; set; }
+
+        [Display(Name = "Date of Birth")]
+        [DataType(DataType.Date)]
+        public DateTime? DateOfBirth { get; set; }
     }
 }

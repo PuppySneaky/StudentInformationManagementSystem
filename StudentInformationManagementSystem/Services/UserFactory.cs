@@ -9,15 +9,18 @@ namespace StudentInformationManagementSystem.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly IAuthService _authService;
+        private readonly IStudentRepository _studentRepository;
 
-        public UserFactory(IUserRepository userRepository, IAuthService authService)
+        public UserFactory(IUserRepository userRepository, IAuthService authService, IStudentRepository studentRepository)
         {
             _userRepository = userRepository;
             _authService = authService;
+            _studentRepository = studentRepository;
         }
 
         public async Task<User> CreateUserAsync(string username, string email, string password, string roleName)
         {
+            // Code remains the same
             // Validate inputs
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) ||
                 string.IsNullOrEmpty(password) || string.IsNullOrEmpty(roleName))
@@ -45,8 +48,6 @@ namespace StudentInformationManagementSystem.Services
             };
 
             // Get role ID based on role name and assign it
-            // This would require a role repository in a real implementation
-            // For now, we'll hardcode role IDs for simplicity
             switch (roleName.ToLower())
             {
                 case "admin":
@@ -68,8 +69,16 @@ namespace StudentInformationManagementSystem.Services
             return user;
         }
 
-        public async Task<User> CreateStudentUserAsync(string username, string email, string password,
-            string firstName, string lastName)
+        public async Task<User> CreateStudentUserAsync(
+            string username,
+            string email,
+            string password,
+            string firstName,
+            string lastName,
+            string address = "",
+            string phoneNumber = "",
+            DateTime? dateOfBirth = null,
+            string studentNumber = "")
         {
             // Create base user with student role
             var user = await CreateUserAsync(username, email, password, "student");
@@ -80,11 +89,15 @@ namespace StudentInformationManagementSystem.Services
                 UserId = user.UserId,
                 FirstName = firstName,
                 LastName = lastName,
+                Address = address ?? "", // Ensure Address is never null
+                PhoneNumber = phoneNumber,
+                DateOfBirth = dateOfBirth,
+                StudentNumber = studentNumber ?? "", // Ensure StudentNumber is never null
                 EnrollmentDate = DateTime.UtcNow
             };
 
-            // In a real implementation, we would save the student profile here
-            // using a student repository
+            // Save the student profile to the database
+            await _studentRepository.CreateAsync(student);
 
             return user;
         }
