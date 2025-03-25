@@ -10,6 +10,7 @@ namespace StudentInformationManagementSystem.Services
         private readonly IUserRepository _userRepository;
         private readonly IAuthService _authService;
         private readonly IStudentRepository _studentRepository;
+        private static readonly Random _random = new Random();
 
         public UserFactory(IUserRepository userRepository, IAuthService authService, IStudentRepository studentRepository)
         {
@@ -20,7 +21,6 @@ namespace StudentInformationManagementSystem.Services
 
         public async Task<User> CreateUserAsync(string username, string email, string password, string roleName)
         {
-            // Code remains the same
             // Validate inputs
             if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(email) ||
                 string.IsNullOrEmpty(password) || string.IsNullOrEmpty(roleName))
@@ -75,13 +75,26 @@ namespace StudentInformationManagementSystem.Services
             string password,
             string firstName,
             string lastName,
+            DateTime? dateOfBirth, // Made nullable but will be validated
             string address = "",
             string phoneNumber = "",
-            DateTime? dateOfBirth = null,
             string studentNumber = "")
         {
             // Create base user with student role
             var user = await CreateUserAsync(username, email, password, "student");
+
+            // Validate Date of Birth - it should not be null by the time it gets here due to validation
+            if (!dateOfBirth.HasValue)
+            {
+                throw new ArgumentException("Date of Birth is required");
+            }
+
+            // Generate a random student number if not provided
+            if (string.IsNullOrEmpty(studentNumber))
+            {
+                // Format: STU-{Current Year}-{Random 5-digit number}
+                studentNumber = $"STU-{DateTime.Now.Year}-{_random.Next(10000, 99999)}";
+            }
 
             // Create student profile
             var student = new Student
@@ -89,10 +102,10 @@ namespace StudentInformationManagementSystem.Services
                 UserId = user.UserId,
                 FirstName = firstName,
                 LastName = lastName,
-                Address = address ?? "", // Ensure Address is never null
+                Address = address ?? "",
                 PhoneNumber = phoneNumber,
-                DateOfBirth = dateOfBirth,
-                StudentNumber = studentNumber ?? "", // Ensure StudentNumber is never null
+                DateOfBirth = dateOfBirth, // Will not be null due to validation
+                StudentNumber = studentNumber,
                 EnrollmentDate = DateTime.UtcNow
             };
 

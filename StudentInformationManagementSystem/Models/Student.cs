@@ -23,8 +23,9 @@ namespace StudentInformationManagementSystem.Models
         [StringLength(50)]
         public string LastName { get; set; }
 
+        [Required]
         [DataType(DataType.Date)]
-        public DateTime? DateOfBirth { get; set; }
+        public DateTime? DateOfBirth { get; set; } // Made nullable but required via validation
 
         [StringLength(200)]
         public string Address { get; set; } = ""; // Default to empty string instead of null

@@ -11,8 +11,27 @@
                 <h2 class="text-center">Student Registration</h2>
             </div>
             <div class="card-body">
-                <form asp-action="Register" method="post">
-                    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+                @if (!ViewData.ModelState.IsValid)
+                {
+                    <div class="alert alert-danger">
+                        <ul>
+                            @foreach (var modelState in ViewData.ModelState.Values)
+                            {
+                                foreach (var error in modelState.Errors)
+                                {
+                                    <li>@error.ErrorMessage</li>
+                                }
+                            }
+                        </ul>
+                    </div>
+                }
+
+                <form asp-action="Register" asp-controller="Account" method="post">
+                    @Html.AntiForgeryToken()
+                    <div asp-validation-summary="All" class="text-danger"></div>
+
+                    <!-- Hidden field for StudentNumber -->
+                    <input asp-for="StudentNumber" type="hidden" value="TEMP" />
 
                     <div class="row">
                         <div class="col-md-6">
@@ -32,13 +51,43 @@
 
                             <div class="form-group mb-3">
                                 <label asp-for="Password" class="control-label"></label>
-                                <input asp-for="Password" class="form-control" />
+                                <div class="input-group">
+                                    <input asp-for="Password" id="password" class="form-control" />
+                                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
+                                <div class="password-strength-container mt-1">
+                                    <div class="progress" style="height: 5px;">
+                                        <div id="password-strength-meter" class="progress-bar" role="progressbar" style="width: 0%;" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100"></div>
+                                    </div>
+                                    <small id="password-strength-text" class="form-text text-muted">Password strength</small>
+                                </div>
+                                <div id="password-requirements" class="mt-2 border rounded p-3 position-relative" style="display: none;">
+                                    <div class="mb-1">
+                                        <span id="req-length" class="text-danger"><i class="bi bi-x-circle"></i> 8-20 Characters</span>
+                                    </div>
+                                    <div class="mb-1">
+                                        <span id="req-capital" class="text-danger"><i class="bi bi-x-circle"></i> At least one capital letter</span>
+                                    </div>
+                                    <div class="mb-1">
+                                        <span id="req-number" class="text-danger"><i class="bi bi-x-circle"></i> At least one number</span>
+                                    </div>
+                                    <div class="mb-1">
+                                        <span id="req-spaces" class="text-danger"><i class="bi bi-x-circle"></i> No spaces</span>
+                                    </div>
+                                </div>
                                 <span asp-validation-for="Password" class="text-danger"></span>
                             </div>
 
                             <div class="form-group mb-3">
                                 <label asp-for="ConfirmPassword" class="control-label"></label>
-                                <input asp-for="ConfirmPassword" class="form-control" />
+                                <div class="input-group">
+                                    <input asp-for="ConfirmPassword" id="confirmPassword" class="form-control" />
+                                    <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
+                                        <i class="bi bi-eye"></i>
+                                    </button>
+                                </div>
                                 <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
                             </div>
                         </div>
@@ -59,12 +108,6 @@
                             </div>
 
                             <div class="form-group mb-3">
-                                <label asp-for="StudentNumber" class="control-label"></label>
-                                <input asp-for="StudentNumber" class="form-control" placeholder="Optional" />
-                                <span asp-validation-for="StudentNumber" class="text-danger"></span>
-                            </div>
-
-                            <div class="form-group mb-3">
                                 <label asp-for="Address" class="control-label"></label>
                                 <input asp-for="Address" class="form-control" placeholder="Optional" />
                                 <span asp-validation-for="Address" class="text-danger"></span>
@@ -72,32 +115,68 @@
 
                             <div class="form-group mb-3">
                                 <label asp-for="PhoneNumber" class="control-label"></label>
-                                <input asp-for="PhoneNumber" class="form-control" placeholder="Optional" />
+                                <input asp-for="PhoneNumber" type="tel" class="form-control" placeholder="Optional"
+                                       pattern="[0-9]*" inputmode="numeric"
+                                       oninput="this.value = this.value.replace(/[^0-9]/g, '')" />
                                 <span asp-validation-for="PhoneNumber" class="text-danger"></span>
+                                <small class="form-text text-muted">Phone number must contain only digits.</small>
                             </div>
 
                             <div class="form-group mb-3">
-                                <label asp-for="DateOfBirth" class="control-label"></label>
-                                <input asp-for="DateOfBirth" class="form-control" />
+                                <label asp-for="DateOfBirth" class="control-label required"></label>
+                                <input asp-for="DateOfBirth" class="form-control" required />
                                 <span asp-validation-for="DateOfBirth" class="text-danger"></span>
+                                <small class="form-text text-muted">Required. Please select your date of birth.</small>
                             </div>
                         </div>
                     </div>
 
                     <div class="form-group d-grid mt-4">
-                        <button type="submit" class="btn btn-primary">Register</button>
+                        <button type="submit" class="btn btn-primary" id="registerButton">Register</button>
                     </div>
                 </form>
             </div>
             <div class="card-footer text-center">
-                <p>Already have an account? <a asp-controller="Auth" asp-action="Login">Login here</a></p>
+                <p class="mb-0">Already have an account? <a asp-controller="Auth" asp-action="Login">Login here</a></p>
+                <p class="small text-muted mt-2">A unique student ID will be automatically generated for your account.</p>
             </div>
         </div>
     </div>
 </div>
 
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+<style>
+    .required:after {
+        content: " *";
+        color: red;
     }
+
+    .text-success i.bi-check-circle {
+        color: #28a745;
+    }
+
+    .text-danger i.bi-x-circle {
+        color: #dc3545;
+    }
+
+    #password-requirements {
+        background-color: #f8f9fa;
+    }
+
+    .progress-bar.bg-danger {
+        background-color: #dc3545 !important;
+    }
+
+    .progress-bar.bg-warning {
+        background-color: #ffc107 !important;
+    }
+
+    .progress-bar.bg-success {
+        background-color: #28a745 !important;
+    }
+</style>
+
+@section Scripts {
+    <script src="~/js/password-strength.js"></script>
+    <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
 }

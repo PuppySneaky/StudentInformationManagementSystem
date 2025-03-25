@@ -1,4 +1,6 @@
 ﻿using StudentInformationManagementSystem.Models;
+using System;
+using System.Threading.Tasks;
 
 namespace StudentInformationManagementSystem.Interfaces
 {
@@ -12,9 +14,9 @@ namespace StudentInformationManagementSystem.Interfaces
             string password,
             string firstName,
             string lastName,
+            DateTime? dateOfBirth, // Made nullable but will be required through validation
             string address = "",
             string phoneNumber = "",
-            DateTime? dateOfBirth = null,
             string studentNumber = "");
 
         Task<User> CreateFacultyUserAsync(string username, string email, string password);
