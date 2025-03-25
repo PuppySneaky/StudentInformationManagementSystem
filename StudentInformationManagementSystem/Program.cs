@@ -1,6 +1,7 @@
 using Microsoft.EntityFrameworkCore;
 using StudentInformationManagementSystem.Data;
 using StudentInformationManagementSystem.Interfaces;
+using StudentInformationManagementSystem.Middleware;
 using StudentInformationManagementSystem.Repositories;
 using StudentInformationManagementSystem.Services;
 using System;
@@ -16,10 +17,12 @@ builder.Services.AddDbContext<ApplicationDbContext>(options =>
 
 // Register repositories and services
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserFactory, UserFactory>();
 
 // Add session services
+builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
 builder.Services.AddSession(options =>
 {
@@ -42,6 +45,10 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 app.UseSession(); // Add session middleware
+
+// Add our custom authorization middleware
+app.UseMiddleware<AuthorizationMiddleware>();
+
 app.UseAuthorization();
 
 app.MapControllerRoute(
