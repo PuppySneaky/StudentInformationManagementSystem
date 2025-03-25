@@ -31,7 +31,9 @@ namespace StudentInformationManagementSystem.Models
         public string Email { get; set; }
 
         [Required]
-        [StringLength(100, ErrorMessage = "The {0} must be at least {2} characters long.", MinimumLength = 6)]
+        [StringLength(20, ErrorMessage = "The {0} must be between {2} and {1} characters long.", MinimumLength = 8)]
+        [RegularExpression(@"^(?=.*[A-Z])(?=.*\d)(?!.*\s).*$",
+            ErrorMessage = "Password must contain at least one capital letter, one number, and no spaces.")]
         [DataType(DataType.Password)]
         [Display(Name = "Password")]
         public string Password { get; set; }
@@ -58,14 +60,17 @@ namespace StudentInformationManagementSystem.Models
         [Display(Name = "Phone Number")]
         [StringLength(20)]
         [DataType(DataType.PhoneNumber)]
+        [RegularExpression(@"^[0-9]*$", ErrorMessage = "Phone number must contain only digits.")]
         public string PhoneNumber { get; set; }
 
-        [Display(Name = "Student Number")]
-        [StringLength(20)]
-        public string StudentNumber { get; set; }
-
+        [Required(ErrorMessage = "Date of Birth is required")]
         [Display(Name = "Date of Birth")]
         [DataType(DataType.Date)]
         public DateTime? DateOfBirth { get; set; }
+
+        // This is hidden but included for model validation 
+        [Display(Name = "Student Number")]
+        [StringLength(20)]
+        public string StudentNumber { get; set; } = "TEMP"; // Temporary value for validation
     }
 }
