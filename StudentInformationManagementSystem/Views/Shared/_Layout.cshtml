@@ -1,6 +1,7 @@
 ﻿@using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor HttpContextAccessor
 <link rel="stylesheet" href="~/css/password-features.css" />
+<link rel="stylesheet" href="~/css/password-buttons.css" />
 
 <!DOCTYPE html>
 <html lang="en">
@@ -76,11 +77,14 @@
         </main>
     </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2025 - StudentInformationManagementSystem - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-        </div>
-    </footer>
+    @if (ViewData["ShowFooter"] as bool? ?? true)
+    {
+        <footer class="border-top footer text-muted">
+            <div class="container">
+                &copy; 2025 - Student Information Management System - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            </div>
+        </footer>
+    }
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/site.js" asp-append-version="true"></script>
