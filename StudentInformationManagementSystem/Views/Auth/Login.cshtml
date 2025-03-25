@@ -30,7 +30,12 @@
 
                     <div class="form-group mb-3">
                         <label asp-for="Password" class="control-label"></label>
-                        <input asp-for="Password" class="form-control" />
+                        <div class="input-group">
+                            <input asp-for="Password" id="password" class="form-control" />
+                            <button type="button" class="btn btn-password-toggle" id="togglePassword">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
                         <span asp-validation-for="Password" class="text-danger"></span>
                     </div>
 
@@ -54,7 +59,46 @@
     </div>
 </div>
 
+<style>
+    /* Custom styling for the password toggle button */
+    .btn-password-toggle {
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        color: #495057;
+    }
+
+        .btn-password-toggle:hover {
+            background-color: #dee2e6;
+            color: #000;
+        }
+
+        .btn-password-toggle:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .btn-password-toggle i {
+            font-size: 1.1rem;
+        }
+</style>
+
 @section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Toggle password visibility
+            $("#togglePassword").click(function() {
+                var passwordField = $("#password");
+                var icon = $(this).find("i");
+
+                if (passwordField.attr("type") === "password") {
+                    passwordField.attr("type", "text");
+                    icon.removeClass("bi-eye").addClass("bi-eye-slash");
+                } else {
+                    passwordField.attr("type", "password");
+                    icon.removeClass("bi-eye-slash").addClass("bi-eye");
+                }
+            });
+        });
+    </script>
     @{
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }

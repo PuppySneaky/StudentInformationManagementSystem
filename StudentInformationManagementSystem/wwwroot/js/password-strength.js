@@ -1,7 +1,14 @@
 ﻿$(document).ready(function () {
     // Show password requirements when password field is focused
     $("#password").on("focus", function () {
-        $("#password-requirements").slideDown(200);
+        $("#password-requirements").fadeIn(200);
+    });
+
+    // Hide password requirements when clicking outside
+    $(document).on("click", function (e) {
+        if (!$(e.target).closest("#password, #password-requirements").length) {
+            $("#password-requirements").fadeOut(200);
+        }
     });
 
     // Toggle password visibility

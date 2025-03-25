@@ -49,11 +49,11 @@
                                 <span asp-validation-for="Email" class="text-danger"></span>
                             </div>
 
-                            <div class="form-group mb-3">
+                            <div class="form-group mb-3 position-relative">
                                 <label asp-for="Password" class="control-label"></label>
                                 <div class="input-group">
                                     <input asp-for="Password" id="password" class="form-control" />
-                                    <button type="button" class="btn btn-outline-secondary" id="togglePassword">
+                                    <button type="button" class="btn btn-password-toggle" id="togglePassword">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </div>
@@ -63,7 +63,7 @@
                                     </div>
                                     <small id="password-strength-text" class="form-text text-muted">Password strength</small>
                                 </div>
-                                <div id="password-requirements" class="mt-2 border rounded p-3 position-relative" style="display: none;">
+                                <div id="password-requirements" class="mt-2 border rounded p-3">
                                     <div class="mb-1">
                                         <span id="req-length" class="text-danger"><i class="bi bi-x-circle"></i> 8-20 Characters</span>
                                     </div>
@@ -84,7 +84,7 @@
                                 <label asp-for="ConfirmPassword" class="control-label"></label>
                                 <div class="input-group">
                                     <input asp-for="ConfirmPassword" id="confirmPassword" class="form-control" />
-                                    <button type="button" class="btn btn-outline-secondary" id="toggleConfirmPassword">
+                                    <button type="button" class="btn btn-password-toggle" id="toggleConfirmPassword">
                                         <i class="bi bi-eye"></i>
                                     </button>
                                 </div>
@@ -159,8 +159,25 @@
     }
 
     #password-requirements {
-        background-color: #f8f9fa;
+        position: absolute;
+        z-index: 1000;
+        background-color: white;
+        border: 1px solid #dee2e6;
+        border-radius: 4px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        width: 100%;
+        display: none;
     }
+
+        #password-requirements:before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 20px;
+            border-width: 0 10px 10px 10px;
+            border-style: solid;
+            border-color: transparent transparent #dee2e6 transparent;
+        }
 
     .progress-bar.bg-danger {
         background-color: #dc3545 !important;
@@ -173,10 +190,34 @@
     .progress-bar.bg-success {
         background-color: #28a745 !important;
     }
+
+    /* Custom styling for the password toggle button */
+    .btn-password-toggle {
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        color: #495057;
+    }
+
+        .btn-password-toggle:hover {
+            background-color: #dee2e6;
+            color: #000;
+        }
+
+        .btn-password-toggle:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .btn-password-toggle i {
+            font-size: 1.1rem;
+        }
 </style>
 
 @section Scripts {
     <script src="~/js/password-strength.js"></script>
     <script src="~/lib/jquery-validation/dist/jquery.validate.min.js"></script>
     <script src="~/lib/jquery-validation-unobtrusive/jquery.validate.unobtrusive.min.js"></script>
+}
+
+@{
+    ViewData["ShowFooter"] = false;
 }
