@@ -1,0 +1,129 @@
+﻿@model StudentInformationManagementSystem.Models.CreateAdminViewModel
+
+@{
+    ViewData["Title"] = "Create Admin";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1>Create Admin Account</h1>
+            <p class="lead">Create a new administrator account for the system.</p>
+            <hr />
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="CreateAdmin" method="post">
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Username" class="control-label"></label>
+                    <input asp-for="Username" class="form-control" />
+                    <span asp-validation-for="Username" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Email" class="control-label"></label>
+                    <input asp-for="Email" class="form-control" />
+                    <span asp-validation-for="Email" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="Password" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="Password" id="password" class="form-control" />
+                        <button type="button" class="btn btn-password-toggle" id="togglePassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="Password" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="ConfirmPassword" class="control-label"></label>
+                    <div class="input-group">
+                        <input asp-for="ConfirmPassword" id="confirmPassword" class="form-control" />
+                        <button type="button" class="btn btn-password-toggle" id="toggleConfirmPassword">
+                            <i class="bi bi-eye"></i>
+                        </button>
+                    </div>
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+
+                <div class="form-group mb-3">
+                    <button type="submit" class="btn btn-primary">Create Admin</button>
+                    <a asp-action="Dashboard" class="btn btn-secondary">Back to Dashboard</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Custom styling for the password toggle button */
+    .btn-password-toggle {
+        background-color: #e9ecef;
+        border: 1px solid #ced4da;
+        color: #495057;
+    }
+
+        .btn-password-toggle:hover {
+            background-color: #dee2e6;
+            color: #000;
+        }
+
+        .btn-password-toggle:focus {
+            box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+        }
+
+        .btn-password-toggle i {
+            font-size: 1.1rem;
+        }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Toggle password visibility
+            $("#togglePassword").click(function() {
+                var passwordField = $("#password");
+                var icon = $(this).find("i");
+
+                if (passwordField.attr("type") === "password") {
+                    passwordField.attr("type", "text");
+                    icon.removeClass("bi-eye").addClass("bi-eye-slash");
+                } else {
+                    passwordField.attr("type", "password");
+                    icon.removeClass("bi-eye-slash").addClass("bi-eye");
+                }
+            });
+
+            // Toggle confirm password visibility
+            $("#toggleConfirmPassword").click(function() {
+                var passwordField = $("#confirmPassword");
+                var icon = $(this).find("i");
+
+                if (passwordField.attr("type") === "password") {
+                    passwordField.attr("type", "text");
+                    icon.removeClass("bi-eye").addClass("bi-eye-slash");
+                } else {
+                    passwordField.attr("type", "password");
+                    icon.removeClass("bi-eye-slash").addClass("bi-eye");
+                }
+            });
+        });
+    </script>
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

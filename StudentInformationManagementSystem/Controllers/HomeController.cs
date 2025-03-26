@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using StudentInformationManagementSystem.Models;
+using StudentInformationManagementSystem.Services;
 using System.Diagnostics;
 
 namespace StudentInformationManagementSystem.Controllers
@@ -25,6 +26,12 @@ namespace StudentInformationManagementSystem.Controllers
             */
 
             return View();
+        }
+        // Add this method to your HomeController class
+        public async Task<IActionResult> RecreateAdmin()
+        {
+            await DbSeeder.ForceCreateAdminUser(HttpContext.RequestServices.GetRequiredService<IApplicationBuilder>());
+            return Content("Admin recreated");
         }
 
         public IActionResult Privacy()

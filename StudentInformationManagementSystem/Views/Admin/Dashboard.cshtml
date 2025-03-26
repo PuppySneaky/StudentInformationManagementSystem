@@ -1,0 +1,77 @@
+﻿@{
+    ViewData["Title"] = "Admin Dashboard";
+}
+
+<div class="container">
+    <div class="row mb-4">
+        <div class="col">
+            <h1 class="display-4">Admin Dashboard</h1>
+            <p class="lead">Welcome to the administration panel.</p>
+            <hr />
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">User Management</h5>
+                    <p class="card-text">Manage user accounts, reset passwords, and view user activity.</p>
+                    <a asp-action="Users" class="btn btn-primary">Manage Users</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Courses</h5>
+                    <p class="card-text">Add, edit, and delete courses in the system.</p>
+                    <a href="#" class="btn btn-primary">Manage Courses</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Enrollments</h5>
+                    <p class="card-text">Manage student enrollments in courses.</p>
+                    <a href="#" class="btn btn-primary">Manage Enrollments</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">System Settings</h5>
+                    <p class="card-text">Configure system-wide settings and preferences.</p>
+                    <a href="#" class="btn btn-primary">Settings</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Reports</h5>
+                    <p class="card-text">Generate and view system reports and analytics.</p>
+                    <a href="#" class="btn btn-primary">View Reports</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100">
+                <div class="card-body">
+                    <h5 class="card-title">Create Admin</h5>
+                    <p class="card-text">Create a new administrator account.</p>
+                    <a asp-action="CreateAdmin" class="btn btn-primary">Create Admin</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

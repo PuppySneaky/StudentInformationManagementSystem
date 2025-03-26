@@ -10,7 +10,11 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
+// Add this line to register the AdminService
+builder.Services.AddScoped<IAdminService, AdminService>();
 
+// Make sure you also have the HttpContextAccessor registered for the AuthorizeRoles attribute
+builder.Services.AddHttpContextAccessor();
 // Add DbContext with SQL Server
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -50,7 +54,7 @@ app.UseSession(); // Add session middleware
 app.UseMiddleware<AuthorizationMiddleware>();
 
 app.UseAuthorization();
-
+await DbSeeder.SeedAdminUser(app);
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
