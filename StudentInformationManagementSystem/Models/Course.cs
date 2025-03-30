@@ -1,10 +1,17 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
 namespace StudentInformationManagementSystem.Models
 {
     public class Course
     {
+        public Course()
+        {
+            // Initialize collections
+            StudentCourses = new HashSet<StudentCourse>();
+        }
+
         [Key]
         public int CourseId { get; set; }
 
@@ -30,5 +37,8 @@ namespace StudentInformationManagementSystem.Models
 
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; } = true;
+
+        // Navigation property for student enrollments
+        public virtual ICollection<StudentCourse> StudentCourses { get; set; }
     }
 }

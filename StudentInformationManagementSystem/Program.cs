@@ -7,6 +7,15 @@ using StudentInformationManagementSystem.Services;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Services.AddSingleton<CourseManager>(provider => {
+    var context = provider.GetRequiredService<ApplicationDbContext>();
+    return CourseManager.GetInstance(context);
+});
+
+builder.Services.AddSingleton<CourseAssignmentManager>(provider => {
+    var context = provider.GetRequiredService<ApplicationDbContext>();
+    return CourseAssignmentManager.GetInstance(context);
+});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
