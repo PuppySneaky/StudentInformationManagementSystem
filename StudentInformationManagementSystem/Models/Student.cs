@@ -9,8 +9,7 @@ namespace StudentInformationManagementSystem.Models
     {
         public Student()
         {
-            // Initialize collections
-            StudentCourses = new HashSet<StudentCourse>();
+            // Removed: StudentCourses initialization
         }
 
         [Key]
@@ -46,8 +45,7 @@ namespace StudentInformationManagementSystem.Models
         // Enrollment date at the university
         public DateTime EnrollmentDate { get; set; }
 
-        // Navigation property for course enrollments
-        public virtual ICollection<StudentCourse> StudentCourses { get; set; }
+        // Removed: Navigation property for course enrollments
 
         // Full name property for display purposes
         [NotMapped]

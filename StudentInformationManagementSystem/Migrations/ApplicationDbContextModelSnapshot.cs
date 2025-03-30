@@ -242,13 +242,13 @@ namespace StudentInformationManagementSystem.Migrations
             modelBuilder.Entity("StudentInformationManagementSystem.Models.StudentCourse", b =>
                 {
                     b.HasOne("StudentInformationManagementSystem.Models.Course", "Course")
-                        .WithMany("StudentCourses")
+                        .WithMany()
                         .HasForeignKey("CourseId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("StudentInformationManagementSystem.Models.Student", "Student")
-                        .WithMany("StudentCourses")
+                        .WithMany()
                         .HasForeignKey("StudentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
@@ -269,19 +269,9 @@ namespace StudentInformationManagementSystem.Migrations
                     b.Navigation("Role");
                 });
 
-            modelBuilder.Entity("StudentInformationManagementSystem.Models.Course", b =>
-                {
-                    b.Navigation("StudentCourses");
-                });
-
             modelBuilder.Entity("StudentInformationManagementSystem.Models.Role", b =>
                 {
                     b.Navigation("Users");
-                });
-
-            modelBuilder.Entity("StudentInformationManagementSystem.Models.Student", b =>
-                {
-                    b.Navigation("StudentCourses");
                 });
 #pragma warning restore 612, 618
         }

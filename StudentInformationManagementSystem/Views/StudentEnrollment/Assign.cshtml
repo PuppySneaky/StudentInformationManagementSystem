@@ -1,6 +1,4 @@
-﻿@model StudentInformationManagementSystem.ViewModels.CourseAssignmentViewModel
-
-@{
+﻿@{
     ViewData["Title"] = "Assign Course";
     Layout = "_AdminLayout";
 }
@@ -9,7 +7,7 @@
     <h1 class="mt-4">Assign Course</h1>
     <ol class="breadcrumb mb-4">
         <li class="breadcrumb-item"><a asp-controller="Admin" asp-action="Dashboard">Dashboard</a></li>
-        <li class="breadcrumb-item"><a asp-controller="CourseAssignment" asp-action="Index">Course Assignments</a></li>
+        <li class="breadcrumb-item"><a asp-action="Index">Student Enrollments</a></li>
         <li class="breadcrumb-item active">Assign Course</li>
     </ol>
 
@@ -21,23 +19,23 @@
                     Assign Course to Student
                 </div>
                 <div class="card-body">
-                    <form asp-action="AssignCourse">
+                    <form asp-action="Assign" method="post">
                         <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
                         <div class="form-group mb-3">
-                            <label asp-for="StudentId" class="control-label"></label>
-                            <select asp-for="StudentId" class="form-select" asp-items="ViewBag.Students">
+                            <label class="control-label">Student</label>
+                            <select name="studentId" class="form-select" asp-items="ViewBag.Students">
                                 <option value="">-- Select Student --</option>
                             </select>
-                            <span asp-validation-for="StudentId" class="text-danger"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="studentId"></span>
                         </div>
 
                         <div class="form-group mb-3">
-                            <label asp-for="CourseId" class="control-label"></label>
-                            <select asp-for="CourseId" class="form-select" asp-items="ViewBag.Courses">
+                            <label class="control-label">Course</label>
+                            <select name="courseId" class="form-select" asp-items="ViewBag.Courses">
                                 <option value="">-- Select Course --</option>
                             </select>
-                            <span asp-validation-for="CourseId" class="text-danger"></span>
+                            <span class="text-danger field-validation-valid" data-valmsg-for="courseId"></span>
                         </div>
 
                         <div class="form-group mt-4">
@@ -60,20 +58,20 @@
         await Html.RenderPartialAsync("_ValidationScriptsPartial");
     }
 
-        <script>
-            $(document).ready(function() {
-                // Add select2 to dropdowns for better user experience
-                if ($.fn.select2) {
-                    $('#StudentId').select2({
-                        theme: 'bootstrap-5',
-                        placeholder: "-- Select Student --"
-                    });
+    <script>
+        $(document).ready(function() {
+            // Add select2 to dropdowns for better user experience
+            if ($.fn.select2) {
+                $('select[name="studentId"]').select2({
+                    theme: 'bootstrap-5',
+                    placeholder: "-- Select Student --"
+                });
 
-                    $('#CourseId').select2({
-                        theme: 'bootstrap-5',
-                        placeholder: "-- Select Course --"
-                    });
-                }
-            });
-        </script>
+                $('select[name="courseId"]').select2({
+                    theme: 'bootstrap-5',
+                    placeholder: "-- Select Course --"
+                });
+            }
+        });
+    </script>
 }

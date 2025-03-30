@@ -1,42 +1,12 @@
-﻿using System;
-using Microsoft.EntityFrameworkCore.Migrations;
-
-#nullable disable
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+using System;
 
 namespace StudentInformationManagementSystem.Migrations
 {
-    /// <inheritdoc />
-    public partial class AddStudentCoursesTable : Migration
+    public partial class AddStudentCoursesTableOnly : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "DateOfBirth",
-                table: "Students",
-                type: "datetime2",
-                nullable: true,
-                oldClrType: typeof(DateTime),
-                oldType: "datetime2");
-
-            migrationBuilder.CreateTable(
-                name: "Courses",
-                columns: table => new
-                {
-                    CourseId = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    CourseCode = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false),
-                    CourseName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
-                    Description = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
-                    CreditHours = table.Column<int>(type: "int", nullable: false),
-                    CreatedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    IsActive = table.Column<bool>(type: "bit", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Courses", x => x.CourseId);
-                });
-
             migrationBuilder.CreateTable(
                 name: "StudentCourses",
                 columns: table => new
@@ -46,7 +16,7 @@ namespace StudentInformationManagementSystem.Migrations
                     StudentId = table.Column<int>(type: "int", nullable: false),
                     CourseId = table.Column<int>(type: "int", nullable: false),
                     EnrollmentDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    Grade = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Grade = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
@@ -77,24 +47,10 @@ namespace StudentInformationManagementSystem.Migrations
                 column: "StudentId");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
                 name: "StudentCourses");
-
-            migrationBuilder.DropTable(
-                name: "Courses");
-
-            migrationBuilder.AlterColumn<DateTime>(
-                name: "DateOfBirth",
-                table: "Students",
-                type: "datetime2",
-                nullable: false,
-                defaultValue: new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
-                oldClrType: typeof(DateTime),
-                oldType: "datetime2",
-                oldNullable: true);
         }
     }
 }

@@ -8,8 +8,7 @@ namespace StudentInformationManagementSystem.Models
     {
         public Course()
         {
-            // Initialize collections
-            StudentCourses = new HashSet<StudentCourse>();
+            // Removed: StudentCourses initialization
         }
 
         [Key]
@@ -38,7 +37,6 @@ namespace StudentInformationManagementSystem.Models
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; } = true;
 
-        // Navigation property for student enrollments
-        public virtual ICollection<StudentCourse> StudentCourses { get; set; }
+        // Removed: Navigation property for student enrollments
     }
 }

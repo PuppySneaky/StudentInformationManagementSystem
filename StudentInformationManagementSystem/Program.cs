@@ -12,11 +12,6 @@ builder.Services.AddSingleton<CourseManager>(provider => {
     return CourseManager.GetInstance(context);
 });
 
-builder.Services.AddSingleton<CourseAssignmentManager>(provider => {
-    var context = provider.GetRequiredService<ApplicationDbContext>();
-    return CourseAssignmentManager.GetInstance(context);
-});
-
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
