@@ -7,23 +7,23 @@ using StudentInformationManagementSystem.Services;
 using System;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddSingleton<CourseManager>(provider => {
-    var context = provider.GetRequiredService<ApplicationDbContext>();
-    return CourseManager.GetInstance(context);
-});
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-// Add DbContext with SQL Server
+// Add DbContext with SQL Server - with explicit ServiceLifetime.Scoped
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")),
+    ServiceLifetime.Scoped);
 
 // Register repositories and services
 builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserFactory, UserFactory>();
+
+// Change CourseManager from Singleton to Scoped 
+builder.Services.AddScoped<CourseManager>();
 
 // Add session services
 builder.Services.AddHttpContextAccessor();

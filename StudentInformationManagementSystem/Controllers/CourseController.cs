@@ -1,9 +1,10 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StudentInformationManagementSystem.Attributes;
 using StudentInformationManagementSystem.Data;
 using StudentInformationManagementSystem.Models;
-using StudentInformationManagementSystem.Services;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 
 namespace StudentInformationManagementSystem.Controllers
 {
@@ -11,43 +12,86 @@ namespace StudentInformationManagementSystem.Controllers
     public class CourseController : Controller
     {
         private readonly ApplicationDbContext _context;
-        private readonly CourseManager _courseManager;
 
         public CourseController(ApplicationDbContext context)
         {
             _context = context;
-            // Get the singleton instance of CourseManager
-            _courseManager = CourseManager.GetInstance(context);
         }
 
         // GET: Course/Index
         public async Task<IActionResult> Index()
         {
-            var courses = await _courseManager.GetAllCoursesAsync();
-            return View(courses);
+            try
+            {
+                // Get current admin user for the ViewBag
+                int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+                if (userId != 0)
+                {
+                    var currentUser = await _context.Users
+                        .Include(u => u.Role)
+                        .FirstOrDefaultAsync(u => u.UserId == userId);
+                    ViewBag.UserName = currentUser?.Username ?? "Admin";
+                }
+
+                var courses = await _context.Courses.ToListAsync();
+                return View(courses);
+            }
+            catch (System.Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+                return View("Error");
+            }
         }
 
         // GET: Course/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                // Get current admin user for the ViewBag
+                int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+                if (userId != 0)
+                {
+                    var currentUser = await _context.Users
+                        .Include(u => u.Role)
+                        .FirstOrDefaultAsync(u => u.UserId == userId);
+                    ViewBag.UserName = currentUser?.Username ?? "Admin";
+                }
+
+                var course = await _context.Courses.FindAsync(id);
+
+                if (course == null)
+                {
+                    return NotFound();
+                }
+
+                return View(course);
             }
-
-            var course = await _courseManager.GetCourseByIdAsync(id.Value);
-
-            if (course == null)
+            catch (System.Exception ex)
             {
-                return NotFound();
+                ViewBag.ErrorMessage = ex.Message;
+                return View("Error");
             }
-
-            return View(course);
         }
 
         // GET: Course/Create
         public IActionResult Create()
         {
+            // Get current admin user for the ViewBag
+            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+            if (userId != 0)
+            {
+                var currentUser = _context.Users
+                    .Include(u => u.Role)
+                    .FirstOrDefault(u => u.UserId == userId);
+                ViewBag.UserName = currentUser?.Username ?? "Admin";
+            }
+
             return View();
         }
 
@@ -56,37 +100,69 @@ namespace StudentInformationManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("CourseCode,CourseName,Description,CreditHours,IsActive")] Course course)
         {
-            if (ModelState.IsValid)
+            try
             {
-                // Check if course code already exists
-                if (await _courseManager.CourseCodeExistsAsync(course.CourseCode))
+                if (ModelState.IsValid)
                 {
-                    ModelState.AddModelError("CourseCode", "This Course Code already exists.");
-                    return View(course);
+                    // Check if course code already exists
+                    bool codeExists = await _context.Courses.AnyAsync(c => c.CourseCode == course.CourseCode);
+                    if (codeExists)
+                    {
+                        ModelState.AddModelError("CourseCode", "This Course Code already exists.");
+                        return View(course);
+                    }
+
+                    // Set creation date
+                    course.CreatedDate = System.DateTime.UtcNow;
+
+                    _context.Add(course);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction(nameof(Index));
                 }
 
-                await _courseManager.AddCourseAsync(course);
-                return RedirectToAction(nameof(Index));
+                return View(course);
             }
-            return View(course);
+            catch (System.Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+                return View("Error");
+            }
         }
 
         // GET: Course/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                // Get current admin user for the ViewBag
+                int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+                if (userId != 0)
+                {
+                    var currentUser = await _context.Users
+                        .Include(u => u.Role)
+                        .FirstOrDefaultAsync(u => u.UserId == userId);
+                    ViewBag.UserName = currentUser?.Username ?? "Admin";
+                }
+
+                var course = await _context.Courses.FindAsync(id);
+
+                if (course == null)
+                {
+                    return NotFound();
+                }
+
+                return View(course);
             }
-
-            var course = await _courseManager.GetCourseByIdAsync(id.Value);
-
-            if (course == null)
+            catch (System.Exception ex)
             {
-                return NotFound();
+                ViewBag.ErrorMessage = ex.Message;
+                return View("Error");
             }
-
-            return View(course);
         }
 
         // POST: Course/Edit/5
@@ -94,42 +170,86 @@ namespace StudentInformationManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, [Bind("CourseId,CourseCode,CourseName,Description,CreditHours,CreatedDate,IsActive")] Course course)
         {
-            if (id != course.CourseId)
+            try
             {
-                return NotFound();
-            }
-
-            if (ModelState.IsValid)
-            {
-                // Check if course code already exists (excluding this course)
-                if (await _courseManager.CourseCodeExistsAsync(course.CourseCode, course.CourseId))
+                if (id != course.CourseId)
                 {
-                    ModelState.AddModelError("CourseCode", "This Course Code already exists.");
-                    return View(course);
+                    return NotFound();
                 }
 
-                await _courseManager.UpdateCourseAsync(course);
-                return RedirectToAction(nameof(Index));
+                if (ModelState.IsValid)
+                {
+                    // Check if course code already exists (excluding this course)
+                    bool codeExists = await _context.Courses.AnyAsync(c =>
+                        c.CourseCode == course.CourseCode && c.CourseId != course.CourseId);
+
+                    if (codeExists)
+                    {
+                        ModelState.AddModelError("CourseCode", "This Course Code already exists.");
+                        return View(course);
+                    }
+
+                    try
+                    {
+                        _context.Update(course);
+                        await _context.SaveChangesAsync();
+                    }
+                    catch (DbUpdateConcurrencyException)
+                    {
+                        if (!await CourseExists(course.CourseId))
+                        {
+                            return NotFound();
+                        }
+                        else
+                        {
+                            throw;
+                        }
+                    }
+                    return RedirectToAction(nameof(Index));
+                }
+                return View(course);
             }
-            return View(course);
+            catch (System.Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+                return View("Error");
+            }
         }
 
         // GET: Course/Delete/5
         public async Task<IActionResult> Delete(int? id)
         {
-            if (id == null)
+            try
             {
-                return NotFound();
+                if (id == null)
+                {
+                    return NotFound();
+                }
+
+                // Get current admin user for the ViewBag
+                int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+                if (userId != 0)
+                {
+                    var currentUser = await _context.Users
+                        .Include(u => u.Role)
+                        .FirstOrDefaultAsync(u => u.UserId == userId);
+                    ViewBag.UserName = currentUser?.Username ?? "Admin";
+                }
+
+                var course = await _context.Courses.FindAsync(id);
+
+                if (course == null)
+                {
+                    return NotFound();
+                }
+
+                return View(course);
             }
-
-            var course = await _courseManager.GetCourseByIdAsync(id.Value);
-
-            if (course == null)
+            catch (System.Exception ex)
             {
-                return NotFound();
+                ViewBag.ErrorMessage = ex.Message;
+                return View("Error");
             }
-
-            return View(course);
         }
 
         // POST: Course/Delete/5
@@ -137,8 +257,27 @@ namespace StudentInformationManagementSystem.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            await _courseManager.DeleteCourseAsync(id);
-            return RedirectToAction(nameof(Index));
+            try
+            {
+                var course = await _context.Courses.FindAsync(id);
+                if (course != null)
+                {
+                    course.IsActive = false;
+                    _context.Update(course);
+                    await _context.SaveChangesAsync();
+                }
+                return RedirectToAction(nameof(Index));
+            }
+            catch (System.Exception ex)
+            {
+                ViewBag.ErrorMessage = ex.Message;
+                return View("Error");
+            }
+        }
+
+        private async Task<bool> CourseExists(int id)
+        {
+            return await _context.Courses.AnyAsync(e => e.CourseId == id);
         }
     }
 }

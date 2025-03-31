@@ -1,9 +1,11 @@
-﻿using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StudentInformationManagementSystem.Attributes;
+using StudentInformationManagementSystem.Data;
 using StudentInformationManagementSystem.Interfaces;
-using StudentInformationManagementSystem.Models;
 using System.Threading.Tasks;
+using System.Linq;
+using Microsoft.AspNetCore.Http;
 
 namespace StudentInformationManagementSystem.Controllers
 {
@@ -11,46 +13,75 @@ namespace StudentInformationManagementSystem.Controllers
     public class AdminController : Controller
     {
         private readonly IUserRepository _userRepository;
+        private readonly ApplicationDbContext _context;
 
-        public AdminController(IUserRepository userRepository)
+        public AdminController(IUserRepository userRepository, ApplicationDbContext context)
         {
             _userRepository = userRepository;
+            _context = context;
         }
 
         // GET: Admin/Dashboard
         public async Task<IActionResult> Dashboard()
         {
-            // Get current admin user
-            int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
-            if (userId == 0)
+            try
             {
-                return RedirectToAction("Login", "Auth");
+                // Get current admin user
+                int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+                if (userId == 0)
+                {
+                    return RedirectToAction("Login", "Auth");
+                }
+
+                var user = await _userRepository.GetByIdAsync(userId);
+                ViewBag.UserName = user?.Username ?? "Admin";
+
+                // Count total users
+                var allUsers = await _userRepository.GetAllAsync();
+                ViewBag.TotalUsers = allUsers.Count();
+
+                // Count students (users with RoleId = 3)
+                ViewBag.TotalStudents = allUsers.Count(u => u.RoleId == 3);
+
+                // Count faculty (users with RoleId = 2)
+                ViewBag.TotalFaculty = allUsers.Count(u => u.RoleId == 2);
+
+                // Get courses count separately
+                var coursesCount = await _context.Courses.CountAsync();
+                ViewBag.TotalCourses = coursesCount;
+
+                return View();
             }
-
-            var user = await _userRepository.GetByIdAsync(userId);
-            ViewBag.UserName = user.Username;
-
-            // You can add statistics or data for the dashboard here
-            ViewBag.TotalUsers = (await _userRepository.GetAllAsync()).Count();
-
-            return View();
+            catch (System.Exception ex)
+            {
+                // Log the error
+                ViewBag.ErrorMessage = ex.Message;
+                return View("Error");
+            }
         }
-
-        // Admin functionality can be added here
-        // For example:
 
         // GET: Admin/ManageUsers
         public async Task<IActionResult> ManageUsers()
         {
-            var users = await _userRepository.GetAllAsync();
-            return View(users);
-        }
+            try
+            {
+                // Get current admin user for the ViewBag
+                int userId = HttpContext.Session.GetInt32("UserId") ?? 0;
+                if (userId != 0)
+                {
+                    var currentUser = await _userRepository.GetByIdAsync(userId);
+                    ViewBag.UserName = currentUser?.Username ?? "Admin";
+                }
 
-        // GET: Admin/ManageCourses
-        public IActionResult ManageCourses()
-        {
-            // This would require a CourseRepository
-            return View();
+                var users = await _userRepository.GetAllAsync();
+                return View(users);
+            }
+            catch (System.Exception ex)
+            {
+                // Log the error
+                ViewBag.ErrorMessage = ex.Message;
+                return View("Error");
+            }
         }
     }
 }

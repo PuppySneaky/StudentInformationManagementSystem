@@ -8,41 +8,16 @@ using System.Threading.Tasks;
 
 namespace StudentInformationManagementSystem.Services
 {
-    // This class implements the Singleton pattern to provide a single instance
-    // of the CourseManager throughout the application
+    // Changed from Singleton to Scoped service
     public class CourseManager
     {
-        // Singleton instance
-        private static CourseManager _instance;
-
-        // Lock object for thread safety
-        private static readonly object _lock = new object();
-
         // Database context
         private readonly ApplicationDbContext _context;
 
-        // Private constructor to prevent direct instantiation
-        private CourseManager(ApplicationDbContext context)
+        // Constructor - now uses dependency injection directly
+        public CourseManager(ApplicationDbContext context)
         {
             _context = context;
-        }
-
-        // Get the singleton instance
-        public static CourseManager GetInstance(ApplicationDbContext context)
-        {
-            // Double-check locking pattern for thread safety
-            if (_instance == null)
-            {
-                lock (_lock)
-                {
-                    if (_instance == null)
-                    {
-                        _instance = new CourseManager(context);
-                    }
-                }
-            }
-
-            return _instance;
         }
 
         // Get all courses
