@@ -4,6 +4,7 @@ using StudentInformationManagementSystem.Models;
 namespace StudentInformationManagementSystem.Data
 {
     public class ApplicationDbContext : DbContext
+
     {
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)
@@ -11,8 +12,11 @@ namespace StudentInformationManagementSystem.Data
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<StudentCourse> StudentCourses { get; set; }
         public DbSet<Role> Roles { get; set; }
         public DbSet<Student> Students { get; set; }
+        public DbSet<Course> Courses { get; set; }
+        // Removed: public DbSet<StudentCourse> StudentCourses { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -36,6 +40,8 @@ namespace StudentInformationManagementSystem.Data
                 .HasOne(s => s.User)
                 .WithOne()
                 .HasForeignKey<Student>(s => s.UserId);
+
+            // Removed: StudentCourse entity configuration
         }
     }
 }

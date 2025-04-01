@@ -48,6 +48,22 @@ namespace StudentInformationManagementSystem.Controllers
             HttpContext.Session.SetString("Username", user.Username);
             HttpContext.Session.SetString("UserRole", user.Role.Name);
 
+            // Redirect based on user role
+            if (user.Role.Name == "Admin")
+            {
+                return RedirectToAction("Dashboard", "Admin");
+            }
+            else if (user.Role.Name == "Faculty")
+            {
+                // Redirect to faculty dashboard when it's implemented
+                return RedirectToAction("Index", "Home");
+            }
+            else if (user.Role.Name == "Student")
+            {
+                // Redirect to student dashboard when it's implemented
+                return RedirectToAction("Index", "Home");
+            }
+
             if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
             {
                 return Redirect(returnUrl);
