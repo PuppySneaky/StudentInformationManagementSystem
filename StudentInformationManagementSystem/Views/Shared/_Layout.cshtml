@@ -47,6 +47,7 @@
                                     @if (HttpContextAccessor.HttpContext.Session.GetString("UserRole") == "Faculty")
                                     {
                                         <li><a class="dropdown-item" href="#">Faculty Dashboard</a></li>
+                                        <li><a class="dropdown-item" asp-controller="Grading" asp-action="Index">Grade Students</a></li>
                                     }
                                     @if (HttpContextAccessor.HttpContext.Session.GetString("UserRole") == "Student")
                                     {

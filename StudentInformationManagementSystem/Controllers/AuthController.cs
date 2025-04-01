@@ -4,8 +4,10 @@ using StudentInformationManagementSystem.Models;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using System;
+using Microsoft.AspNetCore.Authorization;
 
 namespace StudentInformationManagementSystem.Controllers
+
 {
     public class AuthController : Controller
     {
@@ -25,52 +27,41 @@ namespace StudentInformationManagementSystem.Controllers
 
         // POST: Auth/Login
         [HttpPost]
+        [AllowAnonymous]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Login(LoginViewModel model, string returnUrl = null)
+        public async Task<IActionResult> Login(LoginViewModel model)
         {
-            ViewBag.ReturnUrl = returnUrl;
-
-            if (!ModelState.IsValid)
+            if (ModelState.IsValid)
             {
-                return View(model);
+                var user = await _authService.AuthenticateAsync(model.Username, model.Password);
+                if (user != null)
+                {
+                    // Set session variables
+                    HttpContext.Session.SetInt32("UserId", user.UserId);
+                    HttpContext.Session.SetString("Username", user.Username);
+                    HttpContext.Session.SetString("UserRole", user.Role.Name);
+
+                    // Redirect based on role
+                    if (user.Role.Name == "Student")
+                    {
+                        return RedirectToAction("Index", "StudentCourse");
+                    }
+                    else if (user.Role.Name == "Faculty")
+                    {
+                        return RedirectToAction("Index", "Grading");
+                    }
+                    else if (user.Role.Name == "Admin")
+                    {
+                        return RedirectToAction("Dashboard", "Admin");
+                    }
+
+                    return RedirectToAction("Index", "Home");
+                }
+
+                ModelState.AddModelError("", "Invalid username or password");
             }
 
-            var user = await _authService.AuthenticateAsync(model.Username, model.Password);
-
-            if (user == null)
-            {
-                ModelState.AddModelError("", "Invalid login attempt");
-                return View(model);
-            }
-
-            // Create session for the logged-in user
-            HttpContext.Session.SetInt32("UserId", user.UserId);
-            HttpContext.Session.SetString("Username", user.Username);
-            HttpContext.Session.SetString("UserRole", user.Role.Name);
-
-            if (!string.IsNullOrEmpty(returnUrl) && Url.IsLocalUrl(returnUrl))
-            {
-                return Redirect(returnUrl);
-            }
-            else
-            {
-                return RedirectToAction("Index", "Home");
-            }
-        }
-
-        // GET: Auth/Logout
-        public IActionResult Logout()
-        {
-            // Clear the session
-            HttpContext.Session.Clear();
-
-            return RedirectToAction("Index", "Home");
-        }
-
-        // GET: Auth/AccessDenied
-        public IActionResult AccessDenied()
-        {
-            return View();
+            return View(model);
         }
     }
 }

@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
@@ -6,6 +7,11 @@ namespace StudentInformationManagementSystem.Models
 {
     public class Student
     {
+        public Student()
+        {
+            // Removed: StudentCourses initialization
+        }
+
         [Key]
         public int StudentId { get; set; }
 
@@ -23,9 +29,8 @@ namespace StudentInformationManagementSystem.Models
         [StringLength(50)]
         public string LastName { get; set; }
 
-        [Required]
         [DataType(DataType.Date)]
-        public DateTime? DateOfBirth { get; set; } // Made nullable but required via validation
+        public DateTime? DateOfBirth { get; set; }
 
         [StringLength(200)]
         public string Address { get; set; } = ""; // Default to empty string instead of null
@@ -37,7 +42,13 @@ namespace StudentInformationManagementSystem.Models
         [StringLength(20)]
         public string StudentNumber { get; set; } = ""; // Default to empty string instead of null
 
-        // Additional student-specific fields can be added here
+        // Enrollment date at the university
         public DateTime EnrollmentDate { get; set; }
+
+        // Removed: Navigation property for course enrollments
+
+        // Full name property for display purposes
+        [NotMapped]
+        public string FullName => $"{FirstName} {LastName}";
     }
 }
