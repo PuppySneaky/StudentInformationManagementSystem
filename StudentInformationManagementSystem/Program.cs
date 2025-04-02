@@ -27,6 +27,9 @@ builder.Services.AddScoped<IGradeObserver, GradeNotificationObserver>();
 // Change CourseManager from Singleton to Scoped 
 builder.Services.AddScoped<CourseManager>();
 
+// Change CourseManager from Singleton to Scoped 
+builder.Services.AddScoped<CourseManager>();
+
 // Add session services
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddDistributedMemoryCache();
