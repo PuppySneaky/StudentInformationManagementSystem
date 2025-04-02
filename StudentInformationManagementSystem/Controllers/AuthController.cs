@@ -25,6 +25,16 @@ namespace StudentInformationManagementSystem.Controllers
             return View();
         }
 
+        [HttpGet]
+        public IActionResult Logout()
+        {
+            // Clear all session data
+            HttpContext.Session.Clear();
+
+            // Redirect to login page
+            return RedirectToAction("Login", "Auth");
+        }
+
         // POST: Auth/Login
         [HttpPost]
         [AllowAnonymous]
@@ -54,6 +64,8 @@ namespace StudentInformationManagementSystem.Controllers
                     {
                         return RedirectToAction("Dashboard", "Admin");
                     }
+
+
 
                     return RedirectToAction("Index", "Home");
                 }
