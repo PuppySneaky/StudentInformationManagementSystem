@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using StudentInformationManagementSystem.Attributes;
 using StudentInformationManagementSystem.Data;
 using StudentInformationManagementSystem.Models;
+using StudentInformationManagementSystem.Services;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 
@@ -12,10 +13,12 @@ namespace StudentInformationManagementSystem.Controllers
     public class CourseController : Controller
     {
         private readonly ApplicationDbContext _context;
+        private readonly CourseManager _courseManager;
 
         public CourseController(ApplicationDbContext context)
         {
             _context = context;
+            _courseManager = CourseManager.GetInstance(context);
         }
 
         // GET: Course/Index
@@ -33,7 +36,7 @@ namespace StudentInformationManagementSystem.Controllers
                     ViewBag.UserName = currentUser?.Username ?? "Admin";
                 }
 
-                var courses = await _context.Courses.ToListAsync();
+                var courses = await _courseManager.GetAllCoursesAsync();
                 return View(courses);
             }
             catch (System.Exception ex)
@@ -63,7 +66,7 @@ namespace StudentInformationManagementSystem.Controllers
                     ViewBag.UserName = currentUser?.Username ?? "Admin";
                 }
 
-                var course = await _context.Courses.FindAsync(id);
+                var course = await _courseManager.GetCourseByIdAsync(id.Value);
 
                 if (course == null)
                 {
@@ -105,18 +108,14 @@ namespace StudentInformationManagementSystem.Controllers
                 if (ModelState.IsValid)
                 {
                     // Check if course code already exists
-                    bool codeExists = await _context.Courses.AnyAsync(c => c.CourseCode == course.CourseCode);
+                    bool codeExists = await _courseManager.CourseCodeExistsAsync(course.CourseCode);
                     if (codeExists)
                     {
                         ModelState.AddModelError("CourseCode", "This Course Code already exists.");
                         return View(course);
                     }
 
-                    // Set creation date
-                    course.CreatedDate = System.DateTime.UtcNow;
-
-                    _context.Add(course);
-                    await _context.SaveChangesAsync();
+                    await _courseManager.AddCourseAsync(course);
                     return RedirectToAction(nameof(Index));
                 }
 
@@ -149,7 +148,7 @@ namespace StudentInformationManagementSystem.Controllers
                     ViewBag.UserName = currentUser?.Username ?? "Admin";
                 }
 
-                var course = await _context.Courses.FindAsync(id);
+                var course = await _courseManager.GetCourseByIdAsync(id.Value);
 
                 if (course == null)
                 {
@@ -180,8 +179,7 @@ namespace StudentInformationManagementSystem.Controllers
                 if (ModelState.IsValid)
                 {
                     // Check if course code already exists (excluding this course)
-                    bool codeExists = await _context.Courses.AnyAsync(c =>
-                        c.CourseCode == course.CourseCode && c.CourseId != course.CourseId);
+                    bool codeExists = await _courseManager.CourseCodeExistsAsync(course.CourseCode, course.CourseId);
 
                     if (codeExists)
                     {
@@ -191,12 +189,12 @@ namespace StudentInformationManagementSystem.Controllers
 
                     try
                     {
-                        _context.Update(course);
-                        await _context.SaveChangesAsync();
+                        await _courseManager.UpdateCourseAsync(course);
                     }
                     catch (DbUpdateConcurrencyException)
                     {
-                        if (!await CourseExists(course.CourseId))
+                        var exists = await CourseExists(course.CourseId);
+                        if (!exists)
                         {
                             return NotFound();
                         }
@@ -236,7 +234,7 @@ namespace StudentInformationManagementSystem.Controllers
                     ViewBag.UserName = currentUser?.Username ?? "Admin";
                 }
 
-                var course = await _context.Courses.FindAsync(id);
+                var course = await _courseManager.GetCourseByIdAsync(id.Value);
 
                 if (course == null)
                 {
@@ -259,13 +257,7 @@ namespace StudentInformationManagementSystem.Controllers
         {
             try
             {
-                var course = await _context.Courses.FindAsync(id);
-                if (course != null)
-                {
-                    course.IsActive = false;
-                    _context.Update(course);
-                    await _context.SaveChangesAsync();
-                }
+                await _courseManager.DeleteCourseAsync(id);
                 return RedirectToAction(nameof(Index));
             }
             catch (System.Exception ex)
@@ -277,7 +269,8 @@ namespace StudentInformationManagementSystem.Controllers
 
         private async Task<bool> CourseExists(int id)
         {
-            return await _context.Courses.AnyAsync(e => e.CourseId == id);
+            var course = await _courseManager.GetCourseByIdAsync(id);
+            return course != null;
         }
     }
 }

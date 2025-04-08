@@ -24,11 +24,9 @@ builder.Services.AddScoped<IUserFactory, UserFactory>();
 builder.Services.AddScoped<IStudentCourseRepository, StudentCourseRepository>();
 builder.Services.AddScoped<IGradingService, GradingService>();
 builder.Services.AddScoped<IGradeObserver, GradeNotificationObserver>();
-// Change CourseManager from Singleton to Scoped 
-builder.Services.AddScoped<CourseManager>();
 
-// Change CourseManager from Singleton to Scoped 
-builder.Services.AddScoped<CourseManager>();
+// CourseManager is now implemented as Singleton pattern and managed internally
+// No need to register it with the DI container
 
 // Add session services
 builder.Services.AddHttpContextAccessor();

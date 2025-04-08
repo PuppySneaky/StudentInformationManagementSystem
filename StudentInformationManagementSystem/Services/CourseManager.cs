@@ -8,16 +8,38 @@ using System.Threading.Tasks;
 
 namespace StudentInformationManagementSystem.Services
 {
-    // Changed from Singleton to Scoped service
+    // Implemented as Singleton
     public class CourseManager
     {
+        // Private static instance for Singleton pattern
+        private static CourseManager _instance;
+
+        // Lock object for thread safety
+        private static readonly object _lock = new object();
+
         // Database context
         private readonly ApplicationDbContext _context;
 
-        // Constructor - now uses dependency injection directly
-        public CourseManager(ApplicationDbContext context)
+        // Private constructor to prevent direct instantiation
+        private CourseManager(ApplicationDbContext context)
         {
             _context = context;
+        }
+
+        // Public static method to get the instance (Singleton pattern)
+        public static CourseManager GetInstance(ApplicationDbContext context)
+        {
+            if (_instance == null)
+            {
+                lock (_lock)
+                {
+                    if (_instance == null)
+                    {
+                        _instance = new CourseManager(context);
+                    }
+                }
+            }
+            return _instance;
         }
 
         // Get all courses
