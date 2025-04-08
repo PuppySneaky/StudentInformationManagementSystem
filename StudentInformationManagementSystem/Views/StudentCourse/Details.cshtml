@@ -1,47 +1,48 @@
-﻿<!-- Views/StudentCourse/Index.cshtml -->
-@model IEnumerable<StudentInformationManagementSystem.Models.CourseViewModel>
+﻿@model StudentInformationManagementSystem.Models.CourseViewModel
 
 @{
-    ViewData["Title"] = "My Courses";
+    ViewData["Title"] = "Course Details";
 }
 
-<h2>My Courses</h2>
+<h2>Course Details</h2>
 
 <div class="row">
-    <div class="col-md-12">
+    <div class="col-md-8">
         <div class="card">
-            <div class="card-header">
-                <h3>Enrolled Courses</h3>
+            <div class="card-header bg-primary text-white">
+                <h4 class="mb-0">@Model.CourseName (@Model.CourseCode)</h4>
             </div>
             <div class="card-body">
-                <table class="table table-striped">
-                    <thead>
-                        <tr>
-                            <th>Course Code</th>
-                            <th>Course Name</th>
-                            <th>Credit Hours</th>
-                            <th>Grade</th>
-                            <th>Enrollment Date</th>
-                            <th>Actions</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var course in Model)
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Description:</div>
+                    <div class="col-md-8">@Model.Description</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Credit Hours:</div>
+                    <div class="col-md-8">@Model.CreditHours</div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Grade:</div>
+                    <div class="col-md-8">
+                        @if (Model.Grade == "Not Graded")
                         {
-                            <tr>
-                                <td>@course.CourseCode</td>
-                                <td>@course.CourseName</td>
-                                <td>@course.CreditHours</td>
-                                <td>@course.Grade</td>
-                                <td>@course.EnrollmentDate.ToShortDateString()</td>
-                                <td>
-                                    <a asp-action="Details" asp-route-id="@course.CourseId" class="btn btn-info btn-sm">Details</a>
-                                </td>
-                            </tr>
+                            <span class="badge bg-secondary">Not Graded</span>
                         }
-                    </tbody>
-                </table>
+                        else
+                        {
+                            <span class="badge bg-success">@Model.Grade</span>
+                        }
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-4 fw-bold">Enrollment Date:</div>
+                    <div class="col-md-8">@Model.EnrollmentDate.ToString("yyyy-MM-dd")</div>
+                </div>
             </div>
         </div>
     </div>
+</div>
+
+<div class="mt-3">
+    <a asp-action="Index" class="btn btn-secondary">Back to My Courses</a>
 </div>

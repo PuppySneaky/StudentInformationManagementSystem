@@ -1,9 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using StudentInformationManagementSystem.Attributes;
-using StudentInformationManagementSystem.Interfaces;
+using StudentInformationManagementSystem.Data;
 using StudentInformationManagementSystem.Models;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 
 namespace StudentInformationManagementSystem.Controllers
@@ -11,65 +10,66 @@ namespace StudentInformationManagementSystem.Controllers
     [AuthorizeRoles("Student")]
     public class StudentCourseController : Controller
     {
-        private readonly IStudentCourseRepository _studentCourseRepository;
-        private readonly IStudentRepository _studentRepository;
+        private readonly ApplicationDbContext _context;
 
-        public StudentCourseController(
-            IStudentCourseRepository studentCourseRepository,
-            IStudentRepository studentRepository)
+        public StudentCourseController(ApplicationDbContext context)
         {
-            _studentCourseRepository = studentCourseRepository;
-            _studentRepository = studentRepository;
+            _context = context;
         }
 
+        // GET: StudentCourse
         public async Task<IActionResult> Index()
         {
             var userId = HttpContext.Session.GetInt32("UserId");
             if (!userId.HasValue)
                 return RedirectToAction("Login", "Auth");
 
-            var student = await _studentRepository.GetByUserIdAsync(userId.Value);
+            var student = await _context.Students
+                .FirstOrDefaultAsync(s => s.UserId == userId.Value);
+
             if (student == null)
                 return NotFound();
 
-            var enrollments = await _studentCourseRepository.GetByStudentIdAsync(student.StudentId);
-            var viewModels = enrollments.Select(e => new CourseViewModel
-            {
-                CourseId = e.CourseId,
-                CourseCode = e.Course.CourseCode,
-                CourseName = e.Course.CourseName,
-                Description = e.Course.Description,
-                CreditHours = e.Course.CreditHours,
-                Grade = e.Grade ?? "Not Graded",
-                EnrollmentDate = e.EnrollmentDate
-            }).ToList();  // Convert to List to avoid the IEnumerable error
+            var enrollments = await _context.StudentCourses
+                .Include(sc => sc.Course)
+                .Where(sc => sc.StudentId == student.StudentId && sc.IsActive)
+                .ToListAsync();
 
-            return View(viewModels);  // Now passing List<CourseViewModel>
+            return View(enrollments);
         }
 
-        public async Task<IActionResult> Details(int id)
+        // GET: StudentCourse/Details/5
+        public async Task<IActionResult> Details(int? id)
         {
+            if (id == null)
+                return NotFound();
+
             var userId = HttpContext.Session.GetInt32("UserId");
             if (!userId.HasValue)
                 return RedirectToAction("Login", "Auth");
 
-            var student = await _studentRepository.GetByUserIdAsync(userId.Value);
+            var student = await _context.Students
+                .FirstOrDefaultAsync(s => s.UserId == userId.Value);
+
             if (student == null)
                 return NotFound();
 
-            var enrollment = await _studentCourseRepository.GetByIdAsync(id);
-            if (enrollment == null || enrollment.StudentId != student.StudentId)
+            var studentCourse = await _context.StudentCourses
+                .Include(sc => sc.Course)
+                .FirstOrDefaultAsync(sc => sc.StudentCourseId == id && sc.StudentId == student.StudentId);
+
+            if (studentCourse == null)
                 return NotFound();
 
             var viewModel = new CourseViewModel
             {
-                CourseId = enrollment.CourseId,
-                CourseCode = enrollment.Course.CourseCode,
-                CourseName = enrollment.Course.CourseName,
-                Description = enrollment.Course.Description,
-                CreditHours = enrollment.Course.CreditHours,
-                Grade = enrollment.Grade ?? "Not Graded",
-                EnrollmentDate = enrollment.EnrollmentDate
+                CourseId = studentCourse.CourseId,
+                CourseCode = studentCourse.Course.CourseCode,
+                CourseName = studentCourse.Course.CourseName,
+                Description = studentCourse.Course.Description,
+                CreditHours = studentCourse.Course.CreditHours,
+                Grade = studentCourse.Grade ?? "Not Graded",
+                EnrollmentDate = studentCourse.EnrollmentDate
             };
 
             return View(viewModel);
