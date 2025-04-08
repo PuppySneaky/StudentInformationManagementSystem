@@ -1,13 +1,20 @@
 ﻿@model IEnumerable<StudentInformationManagementSystem.Models.StudentCourse>
 
+@{
+    ViewData["Title"] = "My Courses";
+}
+
 <h2>My Courses</h2>
+<h4>Enrolled Courses</h4>
 
 <table class="table table-striped">
-    <thead>
+    <thead class="table-light">
         <tr>
             <th>Course Code</th>
             <th>Course Name</th>
+            <th>Credit Hours</th>
             <th>Grade</th>
+            <th>Enrollment Date</th>
             <th>Actions</th>
         </tr>
     </thead>
@@ -17,9 +24,11 @@
             <tr>
                 <td>@item.Course.CourseCode</td>
                 <td>@item.Course.CourseName</td>
-                <td>@(string.IsNullOrEmpty(item.Grade) ? "Not Graded" : item.Grade)</td>
+                <td>@item.Course.CreditHours</td>
+                <td>@(string.IsNullOrEmpty(item.Grade) ? "Not graded" : item.Grade)</td>
+                <td>@item.EnrollmentDate.ToString("M/d/yyyy")</td>
                 <td>
-                    <a asp-action="Details" asp-route-id="@item.StudentCourseId" class="btn btn-sm btn-info">Details</a>
+                    <a asp-action="Details" asp-route-id="@item.StudentCourseId" class="btn btn-info text-white btn-sm">Details</a>
                 </td>
             </tr>
         }
