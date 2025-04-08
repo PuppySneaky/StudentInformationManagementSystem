@@ -21,6 +21,11 @@ builder.Services.AddScoped<IUserRepository, UserRepository>();
 builder.Services.AddScoped<IStudentRepository, StudentRepository>();
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<IUserFactory, UserFactory>();
+builder.Services.AddScoped<IStudentCourseRepository, StudentCourseRepository>();
+builder.Services.AddScoped<IGradingService, GradingService>();
+builder.Services.AddScoped<IGradeObserver, GradeNotificationObserver>();
+// Change CourseManager from Singleton to Scoped 
+builder.Services.AddScoped<CourseManager>();
 
 // Change CourseManager from Singleton to Scoped 
 builder.Services.AddScoped<CourseManager>();
