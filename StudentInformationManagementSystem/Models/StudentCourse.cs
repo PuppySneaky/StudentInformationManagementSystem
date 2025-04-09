@@ -23,7 +23,8 @@ namespace StudentInformationManagementSystem.Models
         public DateTime EnrollmentDate { get; set; }
 
         [Display(Name = "Grade")]
-        public string Grade { get; set; }
+        [Required] // Make sure this is required
+        public string Grade { get; set; } = ""; // Initialize with empty string instead of null
 
         [Display(Name = "Is Active")]
         public bool IsActive { get; set; } = true;

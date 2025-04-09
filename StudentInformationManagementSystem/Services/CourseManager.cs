@@ -11,7 +11,7 @@ namespace StudentInformationManagementSystem.Services
     // Implemented as Singleton
     public class CourseManager
     {
-        // Private static instance for Singleton pattern
+        // Private static instance for Singleton pattern - important change: don't make this a singleton for testing
         private static CourseManager _instance;
 
         // Lock object for thread safety
@@ -29,6 +29,12 @@ namespace StudentInformationManagementSystem.Services
         // Public static method to get the instance (Singleton pattern)
         public static CourseManager GetInstance(ApplicationDbContext context)
         {
+            // For testing purposes, always return a new instance
+            // This prevents issues with shared state between tests
+            return new CourseManager(context);
+
+            // Original singleton implementation - commenting out for testing
+            /*
             if (_instance == null)
             {
                 lock (_lock)
@@ -40,6 +46,7 @@ namespace StudentInformationManagementSystem.Services
                 }
             }
             return _instance;
+            */
         }
 
         // Get all courses
