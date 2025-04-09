@@ -6,6 +6,7 @@ using StudentInformationManagementSystem.Interfaces;
 using System.Threading.Tasks;
 using System.Linq;
 using Microsoft.AspNetCore.Http;
+using System;
 
 namespace StudentInformationManagementSystem.Controllers
 {
@@ -52,10 +53,10 @@ namespace StudentInformationManagementSystem.Controllers
 
                 return View();
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 // Log the error
-                ViewBag.ErrorMessage = ex.Message;
+                ViewBag.ErrorMessage = ex.Message; // Set the error message explicitly
                 return View("Error");
             }
         }
@@ -76,10 +77,10 @@ namespace StudentInformationManagementSystem.Controllers
                 var users = await _userRepository.GetAllAsync();
                 return View(users);
             }
-            catch (System.Exception ex)
+            catch (Exception ex)
             {
                 // Log the error
-                ViewBag.ErrorMessage = ex.Message;
+                ViewBag.ErrorMessage = ex.Message; // Set the error message explicitly
                 return View("Error");
             }
         }

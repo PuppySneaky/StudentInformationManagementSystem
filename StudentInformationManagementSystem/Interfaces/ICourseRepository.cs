@@ -1,5 +1,6 @@
-﻿// Interfaces/ICourseRepository.cs
-using StudentInformationManagementSystem.Models;
+﻿using StudentInformationManagementSystem.Models;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 namespace StudentInformationManagementSystem.Interfaces
 {
@@ -7,5 +8,8 @@ namespace StudentInformationManagementSystem.Interfaces
     {
         Task<Course> GetByIdAsync(int id);
         Task<IEnumerable<Course>> GetAllAsync();
+        Task<int> CreateAsync(Course course);
+        Task UpdateAsync(Course course);
+        Task DeleteAsync(int id);
     }
 }
